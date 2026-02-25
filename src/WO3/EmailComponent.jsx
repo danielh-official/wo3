@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { NodeViewWrapper } from "@tiptap/react";
 
-export const EmailComponent = ({ node, updateAttributes }) => {
+export const EmailComponent = ({ node, updateAttributes, getPos, editor }) => {
     const {
         isCompose,
         subject,
@@ -29,7 +29,7 @@ export const EmailComponent = ({ node, updateAttributes }) => {
         if (toEmailRef.current) toEmailRef.current.innerText = toEmail;
         if (timestampRef.current) timestampRef.current.innerText = timestamp;
         if (bodyRef.current) bodyRef.current.innerHTML = body;
-    }, []);
+    }, [body, fromEmail, fromName, subject, timestamp, toEmail]);
 
     const updateAll = () => {
         updateAttributes({
@@ -60,6 +60,14 @@ export const EmailComponent = ({ node, updateAttributes }) => {
         updateAttributes({ isCompose: newMode });
     };
 
+    const removeComponentFromEditor = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const from = getPos();
+        const to = from + node.nodeSize;
+        editor.commands.deleteRange({ from, to });
+    };
+
     const defaultImageSrc = "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico";
 
     if (emailMode) {
@@ -69,10 +77,16 @@ export const EmailComponent = ({ node, updateAttributes }) => {
                 as="div"
                 style={{
                     display: "flex",
+                    flexDirection: "column",
                     justifyContent: "center",
                     margin: "16px 0",
                 }}
             >
+                <div style={{ display: "flex", justifyContent: "end", margin: "8px" }}>
+                    <button style={{ cursor: "pointer", border: "none", background: "transparent", fontSize: "16px" }} onClick={removeComponentFromEditor} contentEditable={false}>
+                        &times;
+                    </button>
+                </div>
                 <div
                     style={{
                         maxWidth: "800px",
@@ -254,10 +268,16 @@ export const EmailComponent = ({ node, updateAttributes }) => {
                 as="div"
                 style={{
                     display: "flex",
+                    flexDirection: "column",
                     justifyContent: "center",
                     margin: "16px 0",
                 }}
             >
+                <div style={{ display: "flex", justifyContent: "end", margin: "8px" }}>
+                    <button style={{ cursor: "pointer", border: "none", background: "transparent", fontSize: "16px" }} onClick={removeComponentFromEditor} contentEditable={false}>
+                        &times;
+                    </button>
+                </div>
                 <div
                     style={{
                         maxWidth: "800px",

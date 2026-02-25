@@ -24,7 +24,7 @@ const BubbleTail = ({ side, color }) => {
     );
 };
 
-export const SnapchatComponent = ({ node, updateAttributes }) => {
+export const SnapchatComponent = ({ node, updateAttributes, getPos, editor }) => {
     const { groupName, groupIcon, people, messages } = node.attrs; // ORIGINAL - No defaults!
 
     const groupNameRef = useRef(null);
@@ -51,7 +51,7 @@ export const SnapchatComponent = ({ node, updateAttributes }) => {
                 messageRefs.current[i].innerText = msg.text;
             }
         });
-    }, []);
+    }, [groupName, messages, people]);
 
     const handleGroupNameBlur = () => {
         updateAttributes({ groupName: groupNameRef.current.innerText });
@@ -134,15 +134,29 @@ export const SnapchatComponent = ({ node, updateAttributes }) => {
 
     const getPerson = (personId) => people.find((p) => p.id === personId);
 
+    const removeComponentFromEditor = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const from = getPos();
+        const to = from + node.nodeSize;
+        editor.commands.deleteRange({ from, to });
+    };
+
     return (
         <NodeViewWrapper
             as="div"
             style={{
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
                 margin: "16px 0",
             }}
         >
+            <div style={{ display: "flex", justifyContent: "end", margin: "8px" }}>
+                <button style={{ cursor: "pointer", border: "none", background: "transparent", fontSize: "16px" }} onClick={removeComponentFromEditor} contentEditable={false}>
+                    &times;
+                </button>
+            </div>
             <div
                 style={{
                     border: "1px solid #ddd",

@@ -25,7 +25,7 @@ const BubbleTail = ({ side }) => {
     );
 };
 
-export const MessageComponent = ({ node, updateAttributes }) => {
+export const MessageComponent = ({ node, updateAttributes, getPos, editor }) => {
     const { name, profileImageSrc, messages } = node.attrs; // ORIGINAL - No defaults!
 
     const nameRef = useRef(null);
@@ -41,7 +41,7 @@ export const MessageComponent = ({ node, updateAttributes }) => {
                 messageRefs.current[i].innerText = msg.text;
             }
         });
-    }, []);
+    }, [name, messages]);
 
     const handleNameBlur = () => {
         updateAttributes({ name: nameRef.current.innerText });
@@ -82,15 +82,29 @@ export const MessageComponent = ({ node, updateAttributes }) => {
         }
     };
 
+    const removeComponentFromEditor = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const from = getPos();
+        const to = from + node.nodeSize;
+        editor.commands.deleteRange({ from, to });
+    };
+
     return (
         <NodeViewWrapper
             as="div"
             style={{
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
                 margin: "16px 0",
             }}
         >
+            <div style={{ display: "flex", justifyContent: "end", margin: "8px" }}>
+                <button style={{ cursor: "pointer", border: "none", background: "transparent", fontSize: "16px" }} onClick={removeComponentFromEditor} contentEditable={false}>
+                    &times;
+                </button>
+            </div>
             <div
                 style={{
                     border: "1px solid #ddd",
@@ -100,6 +114,7 @@ export const MessageComponent = ({ node, updateAttributes }) => {
                     maxWidth: "600px",
                     width: "100%",
                     fontFamily: "Arial, sans-serif",
+                    alignSelf: "center",
                 }}
             >
                 {/* Header */}

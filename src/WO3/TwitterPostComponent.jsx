@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { NodeViewWrapper } from "@tiptap/react";
 
-export const TwitterPostComponent = ({ node, updateAttributes }) => {
+export const TwitterPostComponent = ({ node, updateAttributes, getPos, editor }) => {
     const {
         username,
         handle,
@@ -34,7 +34,7 @@ export const TwitterPostComponent = ({ node, updateAttributes }) => {
         if (likesRef.current) likesRef.current.innerText = likes;
         if (retweetsRef.current) retweetsRef.current.innerText = retweets;
         if (repliesRef.current) repliesRef.current.innerText = replies;
-    }, []);
+    }, [handle, likes, replies, retweets, text, timestamp, username]);
 
     const updateAll = () => {
         updateAttributes({
@@ -77,15 +77,29 @@ export const TwitterPostComponent = ({ node, updateAttributes }) => {
         updateAttributes({ retweeted: newRetweetedState });
     };
 
+    const removeComponentFromEditor = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const from = getPos();
+        const to = from + node.nodeSize;
+        editor.commands.deleteRange({ from, to });
+    };
+
     return (
         <NodeViewWrapper
             as="div"
             style={{
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
                 margin: "16px 0",
             }}
         >
+            <div style={{ display: "flex", justifyContent: "end", margin: "8px" }}>
+                <button style={{ cursor: "pointer", border: "none", background: "transparent", fontSize: "16px" }} onClick={removeComponentFromEditor} contentEditable={false}>
+                    &times;
+                </button>
+            </div>
             <div
                 style={{
                     border: "1px solid #e1e8ed",
@@ -98,6 +112,7 @@ export const TwitterPostComponent = ({ node, updateAttributes }) => {
                     fontSize: "15px",
                     lineHeight: "1.4",
                     color: "#0f1419",
+                    alignSelf: "center"
                 }}
                 onBlur={updateAll}
             >

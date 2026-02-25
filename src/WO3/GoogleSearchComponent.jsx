@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { NodeViewWrapper } from "@tiptap/react";
 
-export const GoogleSearchComponent = ({ node, updateAttributes }) => {
+export const GoogleSearchComponent = ({ node, updateAttributes, getPos, editor }) => {
     const { query, results } = node.attrs;
 
     const queryRef = useRef(null);
@@ -62,15 +62,29 @@ export const GoogleSearchComponent = ({ node, updateAttributes }) => {
         resultRefs.current.splice(index, 1);
     };
 
+    const removeComponentFromEditor = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const from = getPos();
+        const to = from + node.nodeSize;
+        editor.commands.deleteRange({ from, to });
+    };
+
     return (
         <NodeViewWrapper
             as="div"
             style={{
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
                 margin: "16px 0",
             }}
         >
+            <div style={{ display: "flex", justifyContent: "end", margin: "8px" }}>
+                <button style={{ cursor: "pointer", border: "none", background: "transparent", fontSize: "16px" }} onClick={removeComponentFromEditor} contentEditable={false}>
+                    &times;
+                </button>
+            </div>
             <div
                 style={{
                     border: "1px solid #ddd",
@@ -80,6 +94,7 @@ export const GoogleSearchComponent = ({ node, updateAttributes }) => {
                     maxWidth: "600px",
                     width: "100%",
                     fontFamily: "Arial, sans-serif",
+                    alignSelf: "center",
                 }}
             >
                 {/* Search bar */}

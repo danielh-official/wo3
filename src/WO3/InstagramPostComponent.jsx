@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { NodeViewWrapper } from "@tiptap/react";
 
-export const InstagramPostComponent = ({ node, updateAttributes }) => {
+export const InstagramPostComponent = ({ node, updateAttributes, getPos, editor }) => {
     const {
         username = "johndoe",
         caption = "Beautiful sunset today! 🌅",
@@ -117,15 +117,29 @@ export const InstagramPostComponent = ({ node, updateAttributes }) => {
     // Ensure commentsList is always an array for rendering
     const safeCommentsList = Array.isArray(commentsList) ? commentsList : [];
 
+    const removeComponentFromEditor = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const from = getPos();
+        const to = from + node.nodeSize;
+        editor.commands.deleteRange({ from, to });
+    };
+
     return (
         <NodeViewWrapper
             as="div"
             style={{
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
                 margin: "16px 0",
             }}
         >
+            <div style={{ display: "flex", justifyContent: "end", margin: "8px" }}>
+                <button style={{ cursor: "pointer", border: "none", background: "transparent", fontSize: "16px" }} onClick={removeComponentFromEditor} contentEditable={false}>
+                    &times;
+                </button>
+            </div>
             <div
                 style={{
                     border: "1px solid #dbdbdb",
@@ -136,6 +150,7 @@ export const InstagramPostComponent = ({ node, updateAttributes }) => {
                     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
                     fontSize: "14px",
                     color: "#262626",
+                    alignSelf: "center",
                 }}
                 onBlur={updateAll}
             >

@@ -208,7 +208,7 @@ function extractDynamicStylesAndClasses(html) {
     return { html: doc.body.innerHTML, css };
 }
 
-export const NewsWebsiteComponent = ({ node, updateAttributes }) => {
+export const NewsWebsiteComponent = ({ node, updateAttributes, getPos, editor }) => {
     const {
         siteName,
         siteLink,
@@ -252,7 +252,7 @@ export const NewsWebsiteComponent = ({ node, updateAttributes }) => {
         if (siteNameRef.current) siteNameRef.current.innerText = siteName;
         if (headlineRef.current) headlineRef.current.innerText = headline;
         if (subheadlineRef.current) subheadlineRef.current.innerText = subheadline;
-    }, []);
+    }, [siteName, headline, subheadline]);
 
     const handleBlur = () => {
         updateAttributes({
@@ -536,9 +536,22 @@ export const NewsWebsiteComponent = ({ node, updateAttributes }) => {
         </div>
     );
 
+    const removeComponentFromEditor = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const from = getPos();
+        const to = from + node.nodeSize;
+        editor.commands.deleteRange({ from, to });
+    };
+
     return (
-        <NodeViewWrapper style={{ display: "flex", justifyContent: "center", margin: "16px 0" }}>
-            <div style={{ border: "1px solid #ddd", borderRadius: "8px", background: "white", maxWidth: "800px", width: "100%", overflow: "hidden" }}>
+        <NodeViewWrapper style={{ display: "flex", flexDirection: "column", justifyContent: "center", margin: "16px 0" }}>
+            <div style={{ display: "flex", justifyContent: "end", margin: "8px" }}>
+                <button style={{ cursor: "pointer", border: "none", background: "transparent", fontSize: "16px" }} onClick={removeComponentFromEditor} contentEditable={false}>
+                    &times;
+                </button>
+            </div>
+            <div style={{ border: "1px solid #ddd", borderRadius: "8px", background: "white", maxWidth: "800px", width: "100%", overflow: "hidden", alignSelf: "center" }}>
                 {/* Top bar */}
                 <div style={{ display: "flex", alignItems: "center", ...templateStyles[styleVariant].topBar }}>
                     {siteLink ? (
